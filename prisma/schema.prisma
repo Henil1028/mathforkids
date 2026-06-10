@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id              String            @id @default(cuid())
+  username        String            @unique
+  email           String            @unique
+  createdAt       DateTime          @default(now()) @map("created_at")
+  quizAttempts    QuizAttempt[]
+  questionHistory QuestionHistory[]
+
+  @@map("users")
+}
+
+model QuizAttempt {
+  id             String     @id @default(cuid())
+  userId         String     @map("user_id")
+  operation      Operation
+  difficulty     Difficulty
+  score          Int
+  totalQuestions Int        @map("total_questions")
+  timeTaken      Int        @map("time_taken")
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_attempts")
+}
+
+model QuestionHistory {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  attemptId     String   @map("attempt_id")
+  question      String
+  correctAnswer Int      @map("correct_answer")
+  userAnswer    Int?     @map("user_answer")
+  isCorrect     Boolean  @map("is_correct")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("question_history")
+}
+
+enum Operation {
+  ADDITION
+  SUBTRACTION
+  MULTIPLICATION
+  DIVISION
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
