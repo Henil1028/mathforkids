@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const SYMBOLS = ['+', '−', '×', '÷', '=', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'π', '%', '√'];
@@ -16,7 +16,14 @@ interface FloatingSymbol {
 }
 
 export default function FloatingSymbols() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const symbols = useMemo<FloatingSymbol[]>(() => {
+    if (!mounted) return [];
     return Array.from({ length: 24 }, (_, i) => ({
       symbol: SYMBOLS[i % SYMBOLS.length],
       x: Math.random() * 100,
@@ -26,7 +33,7 @@ export default function FloatingSymbols() {
       delay: Math.random() * 10,
       opacity: Math.random() * 0.15 + 0.05,
     }));
-  }, []);
+  }, [mounted]);
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
